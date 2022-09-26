@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<br>
+<h5><b>Sciencelow</b></h5>
+
+This is a small project that collects and tries to analyze the articles in some of the journals with studies on children in the SJR (Scientific Journal List) in the last 5 years (2017-2022). This project contains information on <b>4888</b> articles from a total of <b>13</b> journals.
+
+In the selection of the journals included in the project, factors such as the focus of the journals on studies related to children and the permission to collect basic information about the articles (title, year, abstract, etc.) on the web pages were taken into consideration. In this context, databases such as <i>Wiley, Sagepub, ScienceDirect</i>, which are not allowed to collect data from web pages, are excluded from the scope.
+
+
+<div class="flex-container">
+  <div class="flex-item">
+    <a href="/articlecharts">
+    <div class="card-container">
+      <img src="{{url_for('static',filename='vector1.png')}}" alt="Avatar" class="image">
+      <div class="overlay overlay1">
+        <div class="text">Article Charts</div>
+      </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="flex-item">
+    <a href="/journalchats">
+    <div class="card-container">
+      <img src="{{url_for('static',filename='vector2.png')}}" alt="Avatar" class="image">
+      <div class="overlay overlay2">
+        <div class="text">Journal Charts</div>
+      </div>
+    </div>
+    </a>
+  </div>
+
+  <div class="flex-item">
+    <a href="/search">
+    <div class="card-container">
+      <img src="{{url_for('static',filename='vector3.png')}}" alt="Avatar" class="image">
+      <div class="overlay overlay3">
+        <div class="text">Search</div>
+      </div>
+    </div>
+    </a>
+  </div>
+</div>
+
+<br>
+
+
+{% endblock body %}

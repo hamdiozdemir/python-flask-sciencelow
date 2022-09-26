@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+
+<div class="gridline2">
+  <div id="sidebar">
+    <form action="/search" method="POST">
+      <div class="form-control" style="background:None;">
+        <label for="key">Search on Article Titles</label>
+        <input type="text" class="form-control" name="searchkey" id="formControlInput" placeholder="Search"> <br>
+        <button type="submit" class="btn btn-info">Search</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="content">
+
+  {% if dataAll == [] %}
+  <i>Sorry, we could not find such a thing.</i>
+  
+  {% else %}
+
+  <canvas class="chart" id="searchChart" style="width:100%;max-width:900px"></canvas>
+
+
+
+
+    
+
+
+  {% for data in dataAll %}
+  
+  
+  <div class="article">
+    <h6><a href="{{data['article_link']}}" target="_blank">{{data["article_title"]}}</a></h6>
+    <i>{{data["authors"]}}</i><br>
+    {{data["journal_title"]}} <i>{{data["year"]}}, {{data["volume"]}}({{data["issue"]}})</i>
+    <hr>
+    <p><i>{{data["abstract"]}}</i></p>
+
+  </div>
+  {% endfor %}
+
+  {% endif %}
+
+  </div>
+</div>
+
+    {% if request.method=="POST" %}
+    <script>
+      var yearData = {{yearData | tojson}}
+      var yearFreq = {{yearFreq | tojson}}
+    </script>
+    {% else %}
+    {% endif %}
+
+
+
+
+
+{% endblock body %}

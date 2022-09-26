@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+
+<div class="gridline">
+    <div id="main">Below, some analysis results of the titles of the articles in the database are given in graphics.</div>
+    <div class="grid-content" id="content1">
+        <canvas class="chart" id="quartileChart" style="width:100%;max-width:700px"></canvas>
+        <p>The chart shows the quartiles of the journals of the articles in the database according to SJR.</p>
+    </div>
+    
+    <div class="grid-content" id="content2">
+        <canvas class="chart" id="yearChart" style="width:100%;max-width:700px"></canvas>
+        <p>The chart shows the distribution of the articles in the database according to the publication years.</p>
+    </div>
+    <div class="grid-content" id="content3">
+        <canvas class="chart" id="commonChart" style="width:100%;max-width:700px"></canvas>
+        <p>BarChart shows the frequencies of the top 20 words in the article titles. Line graphs show the distribution of these words by years. Data can be hidden/shown by clicking on the labels at the top.</p>
+    </div>
+    <div class="grid-content" id="content4">
+        <canvas class="chart" id="allCategoryChart" style="width:100%;max-width:700px"></canvas>
+        <p>Frequencies of the categories created for the most frequently used words in the article titles are given in the chart.</p>
+    </div>
+    <div class="grid-content" id="content5">
+        <canvas class="chart" id="familyCategoryChart" style="width:100%;max-width:700px"></canvas>
+        <p>The frequencies of the words under the <b>family</b> category are shown in the chart.</p>
+    </div>
+    <div class="grid-content" id="content6">
+        <canvas class="chart" id="academicCategoryChart" style="width:100%;max-width:700px"></canvas>
+        <p>The frequencies of the words under the <b>academic</b> category are shown in the chart.</p>
+    </div>
+    <div class="grid-content" id="content7">
+        <canvas class="chart" id="senCategoryChart" style="width:100%;max-width:700px"></canvas>
+        <p>The frequencies of the words under the <b>SEN (Special Education)</b> category are shown in the chart.</p>
+    </div>
+    <div class="grid-content" id="content8">
+        <canvas class="chart" id="wellbeingCategoryChart" style="width:100%;max-width:700px"></canvas>
+        <p>The frequencies of the words under the <b>wellbeing</b> category are shown in the chart.</p>
+    </div>
+    <div class="grid-content" id="content9">
+        <canvas class="chart" id="diversityCategoryChart" style="width:100%;max-width:700px"></canvas>
+        <p>The frequencies of the words under the <b>diversity</b> category are shown in the chart.</p>
+    </div>
+    <div class="grid-content" id="content10">
+        <canvas class="chart" id="digitalCategoryChart" style="width:100%;max-width:700px"></canvas>
+        <p>The frequencies of the words under the <b>digital</b> category are shown in the chart.</p>
+    </div>
+    <div class="grid-content" id="content11">
+        <canvas class="chart" id="attiduteCategoryChart" style="width:100%;max-width:700px"></canvas>
+        <p>The frequencies of the words under the <b>attidute</b> category are shown in the chart.</p>
+    </div>
+    <div class="grid-content" id="content12">
+        <canvas class="chart" id="othersCategoryChart" style="width:100%;max-width:700px"></canvas>
+        <p>Under the Others category, the frequencies of the TOP 20 Keywords or words that are not included in the above categories, but that may be interesting, are shown.</p>
+    </div>
+
+</div>
+
+
+
+
+
+
+{% endblock body %}

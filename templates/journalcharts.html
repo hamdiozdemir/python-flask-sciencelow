@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+
+
+<div class="gridline">
+    <div id="main">
+        <p>The basic information of the journals in the database is given below.</p>
+    </div>
+    <div id="content1">
+        <h4><b>JOURNAL LİST</b></h4>
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Journal</th>
+                <th scope="col">Impact Factor</th>
+                <th scope="col">Quartile</th>
+                <th scope="col">Number of Article</th>
+                <th scope="col">Year</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for journal in journaldata %}
+              <tr>
+                <th><a href="{{journal['journal_link']}}" target="_blank">{{journal["journal_title"]}}</a></th>
+                <td>{{journal["ifactor"]}}</td>
+                <td>{{journal["quartile"]}}</td>
+                <td>{{journal["article_num"]}}</td>
+                <td>2017 - 2022 (August)</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+    </div>
+    <div id="content2">
+        <canvas class="chart" id="journalChart" style="width:100%;max-width:900px"></canvas>
+        <p>The total number of articles in the journals in the database is shown in the chart.</p>
+    </div>
+
+
+</div>
+
+
+
+
+
+{% endblock body %}
