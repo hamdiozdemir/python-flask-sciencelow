@@ -8,7 +8,23 @@
     <form action="/search" method="POST">
       <div class="form-control" style="background:None;">
         <label for="key">Search on Article Titles</label>
-        <input type="text" class="form-control" name="searchkey" id="formControlInput" placeholder="Search"> <br>
+        <input type="text" class="form-control" name="searchkey" id="searchkey" placeholder="Search on Titles"> <br>
+        <button type="submit" class="btn btn-info">Search</button>
+      </div>
+    </form>
+
+    <form action="/search" method="POST">
+      <div class="form-control" style="background:None;">
+        <label for="key">Search on Article Abstracts</label>
+        <input type="text" class="form-control" name="searchkey2" id="searchkey2" placeholder="Search on Abstracts"> <br>
+        <button type="submit" class="btn btn-info">Search</button>
+      </div>
+    </form>
+
+    <form action="/search" method="POST">
+      <div class="form-control" style="background:None;">
+        <label for="key">Search on Authors</label>
+        <input type="text" class="form-control" name="searchkey3" id="searchkey3" placeholder="Search on Authors"> <br>
         <button type="submit" class="btn btn-info">Search</button>
       </div>
     </form>
@@ -49,8 +65,8 @@
 
     {% if request.method=="POST" %}
     <script>
-      var yearData = {{yearData | tojson}}
-      var yearFreq = {{yearFreq | tojson}}
+      var dataYear = {{dataYear | tojson}}
+      var dataFreq = {{dataFreq | tojson}}
     </script>
     {% else %}
     {% endif %}

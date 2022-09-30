@@ -219,8 +219,8 @@ th{
 .gridline2 {
     display: grid;
     height: 100vh;
-    grid-template-columns: 0.3fr 1.5fr;
-    grid-template-rows: 1fr;
+    grid-template-columns: 0.5fr 1.5fr;
+    grid-template-rows: auto;
     grid-auto-rows: minmax(min-content);
     grid-template-areas: 
     "sidebar content";
@@ -234,7 +234,7 @@ th{
     /* background: blueviolet; */
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     grid-area: sidebar;
-    min-height: 150px;
+    min-height: auto;
     border-radius: var(--main-radius);
     padding: var(--main-padding);
 }
@@ -251,7 +251,7 @@ th{
 @media only screen and (max-width:900px){
     .gridline2{
         grid-template-columns: 1fr;
-        grid-template-rows: 0.4fr 1fr;
+        grid-template-rows: fit-content auto;
         grid-template-areas: 
         "sidebar"
         "content";

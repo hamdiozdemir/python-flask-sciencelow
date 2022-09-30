@@ -47,19 +47,62 @@ def search():
     if request.method == "GET":
         return render_template("search.html")
     else:
-        searchkey = str(request.form.get("searchkey"))
-        cursor = mysql.connection.cursor()
-        query = "SELECT * FROM articles WHERE article_title LIKE %s ORDER BY year DESC"
-        result = cursor.execute(query,('%'+searchkey+'%',))
-        if result == 0:
-            dataAll = []
-            yearData, yearFreq = searchData(searchkey)
-            return render_template("search.html",dataAll=dataAll,yearData=yearData,yearFreq=yearFreq)
-        else:
-            dataAll = cursor.fetchall()
+        # searchkey = str(request.form.get("searchkey"))
+        # cursor = mysql.connection.cursor()
+        # query = "SELECT * FROM articles WHERE article_title LIKE %s OR abstract LIKE %s ORDER BY year DESC"
+        # result = cursor.execute(query,('%'+searchkey+'%','%'+searchkey+'%'))
+        # if result == 0:
+        #     dataAll = []
+        #     dataYear, dataFreq = [0],[0]
+        #     return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
+        # else:
+        #     dataAll = cursor.fetchall()
+        #     dataYear, dataFreq = searchData(searchkey)
+        #     return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
+        dataAll = []
+        dataYear = []
+        dataFreq = []
+        if "searchkey" in request.form:
+            searchkey = str(request.form.get("searchkey"))
+            dataYear, dataFreq = searchData(searchkey)
+            cursor = mysql.connection.cursor()
+            result = cursor.execute("SELECT * FROM articles WHERE article_title LIKE '%"+searchkey+"%'")
+            if result == 0:
+                dataAll = []
+            else:
+                dataAll = cursor.fetchall()
             cursor.close()
-            yearData, yearFreq = searchData(searchkey)
-            return render_template("search.html",dataAll=dataAll,yearData=yearData,yearFreq=yearFreq)
+            return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
+        elif "searchkey2" in request.form:
+            searchkey = str(request.form.get("searchkey2"))
+            dataYear, dataFreq = searchData2(searchkey)
+            cursor = mysql.connection.cursor()
+            result = cursor.execute("SELECT * FROM articles WHERE abstract LIKE '%"+searchkey+"%'")
+            if result == 0:
+                dataAll = []
+            else:
+                dataAll = cursor.fetchall()
+            cursor.close()
+            return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
+            
+        elif "searchkey3" in request.form:
+            searchkey = str(request.form.get("searchkey3"))
+            dataYear, dataFreq = searchData3(searchkey)
+            cursor = mysql.connection.cursor()
+            result = cursor.execute("SELECT * FROM articles WHERE authors LIKE '%"+searchkey+"%'")
+            if result == 0:
+                dataAll = []
+            else:
+                dataAll = cursor.fetchall()
+            cursor.close()
+            return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
+        else:
+            dataAll = []
+            dataYear = [0]
+            dataFreq = [0]
+            return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
+
+
 
 
 
@@ -144,18 +187,40 @@ def topCommonKeywordsAll():
       
 
 def searchData(key):
-    yearData = []
-    yearFreq = []
+    dataYear = []
+    dataFreq = []
     cursor = mysql.connection.cursor()
     query = "SELECT * FROM articles WHERE year=%s AND article_title LIKE %s"
     for year in range(2017,2023):
-        freq = cursor.execute(query,(year,"%"+key+"%"))
-        yearData.append(year)
-        yearFreq.append(freq)
+        freq = cursor.execute(query,(year,"%"+key+"%",))
+        dataYear.append(year)
+        dataFreq.append(freq)
     cursor.close()
-    return yearData, yearFreq
+    return dataYear, dataFreq
 
+def searchData2(key):
+    dataYear = []
+    dataFreq = []
+    cursor = mysql.connection.cursor()
+    query = "SELECT * FROM articles WHERE year=%s AND abstract LIKE %s"
+    for year in range(2017,2023):
+        freq = cursor.execute(query,(year,"%"+key+"%",))
+        dataYear.append(year)
+        dataFreq.append(freq)
+    cursor.close()
+    return dataYear, dataFreq
 
+def searchData3(key):
+    dataYear = []
+    dataFreq = []
+    cursor = mysql.connection.cursor()
+    query = "SELECT * FROM articles WHERE year=%s AND authors LIKE %s"
+    for year in range(2017,2023):
+        freq = cursor.execute(query,(year,"%"+key+"%",))
+        dataYear.append(year)
+        dataFreq.append(freq)
+    cursor.close()
+    return dataYear, dataFreq
 
 def journal_infos():
     cursor = mysql.connection.cursor()

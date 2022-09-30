@@ -459,10 +459,10 @@ new Chart("searchChart", {
   
   data: {
     
-    labels: yearData,
+    labels: dataYear,
     datasets: [{
       backgroundColor: barColors,
-      data: yearFreq,
+      data: dataFreq,
       hoverBorderWidth:5
     }]
   },
