@@ -1,79 +1,109 @@
 // SOME COLOURS ETC.
 var barColors = [
-  'rgba(255, 99, 132, 0.2)',
-  'rgba(255, 159, 64, 0.2)',
-  'rgba(255, 205, 130, 0.2)',
-  'rgba(75, 192, 192, 0.2)',
-  'rgba(54, 162, 235, 0.2)',
-  'rgba(153, 102, 255, 0.2)',
-  'rgba(201, 203, 207, 0.2)',
-  'rgba(255, 99, 132, 0.2)',
-  'rgba(180, 159, 64, 0.2)',
-  'rgba(255, 130, 86, 0.2)',
-  'rgba(75, 192, 88, 0.2)',
-  'rgba(54, 162, 235, 0.2)',
-  'rgba(200, 102, 200, 0.2)',
-  'rgba(190, 99, 150, 0.2)',
-  'rgba(230, 159, 99, 0.2)',
-  'rgba(255, 205, 86, 0.2)',
-  'rgba(75, 192, 192, 0.2)',
-  'rgba(130, 162, 235, 0.2)',
-  'rgba(153, 102, 200, 0.2)',
+  'rgba(255, 99, 132, 0.4)',
+  'rgba(255, 159, 64, 0.4)',
+  'rgba(255, 205, 130, 0.4)',
+  'rgba(75, 192, 192, 0.4)',
+  'rgba(54, 162, 235, 0.4)',
+  'rgba(153, 102, 255, 0.4)',
+  'rgba(201, 203, 207, 0.4)',
+  'rgba(255, 99, 132, 0.4)',
+  'rgba(180, 159, 64, 0.4)',
+  'rgba(255, 130, 86, 0.4)',
+  'rgba(75, 192, 88, 0.4)',
+  'rgba(54, 162, 235, 0.4)',
+  'rgba(200, 102, 200, 0.4)',
+  'rgba(190, 99, 150, 0.4)',
+  'rgba(230, 159, 99, 0.4)',
+  'rgba(255, 205, 86, 0.4)',
+  'rgba(75, 192, 192, 0.4)',
+  'rgba(130, 162, 235, 0.4)',
+  'rgba(153, 102, 200, 0.4)',
 
 ];
 
-// BAR CHART - ARTICLE PER JOURNAL
+// CHART - Top 20 Keywords
 
-fetch("/api/chart-data/")
+fetch("/api/chart-data-top/")
 .then(r => r.json())
 .then(r => {
-  new Chart("journalChart", {
+  new Chart("commonChart", {
     type: "bar",
     
     data: {
       
-      labels: r.journalList,
+      labels: r.topKeys,
       datasets: [{
-        label:"Data",
         backgroundColor: barColors,
-        data: r.articleCount,
-        hoverBorderWidth:5
-      }]
+        data: r.freqSum,
+        hoverBorderWidth:5,
+        label: "ALL"
+      },
+    {
+      label: '2017',
+      data: r.freq2017,
+      type: 'line',
+      fill: false,
+      borderColor: 'rgba(0, 255, 0, 0.6)'
+
+    },{
+      label: "2018",
+      data: r.freq2018,
+      type: "line",
+      fill: false,
+      borderColor: 'rgba(0, 127, 255, 0.6)'
+    },{
+      label: "2019",
+      data: r.freq2019,
+      type: "line",
+      fill: false,
+      borderColor: 'rgba(170, 255, 170, 0.6)'
+    },{
+      label: "2020",
+      data: r.freq2020,
+      type: "line",
+      fill: false,
+      borderColor: 'rgba(255, 86, 255, 0.6)'
+    },{
+      label: "2021",
+      data: r.freq2021,
+      type: "line",
+      fill: false,
+      borderColor: 'rgba(0, 0, 180, 0.6)'
+    },{
+      label: "2022",
+      data: r.freq2022,
+      type: "line",
+      fill: false,
+      borderColor: 'rgba(0, 180, 130, 0.6)'
+    }
+  ]
     },
     options: {
       title: {
         display: true,
-        text: "Articles per Journals"
+        text: "TOP 20 Keywords' Frequancies per Article Title"
       },
       legend:{
-        display: false,
-      }
-  
-  
-    }
-  });
-  new Chart("quartileChart", {
-    type: "pie",
-    data: {
-      labels: r.quartile_list,
-      datasets: [{
-        backgroundColor: barColors,
-        data: r.quartile_num,
-        hoverBorderWidth: 5
-  
-      }]
-    },
-    options: {
-      title: {
         display: true,
-        text: "Articles per Journal Quartile"
+      },
+      scales:{
+        yAxes:[{
+          ticks:{
+            beginAtZero: true
+          }
+        }]
       }
-      // hoverBackgroundColor: "black",
+  
   
     }
   });
+})
 
-
+// CHARTS - Categories
+fetch("/api/chart-data-categories/")
+.then(r => r.json())
+.then(r=>{
   new Chart("allCategoryChart", {
     type: "bar",
     
@@ -100,7 +130,6 @@ fetch("/api/chart-data/")
     }
   });
 
-
   new Chart("familyCategoryChart", {
     type: "bar",
     
@@ -126,7 +155,6 @@ fetch("/api/chart-data/")
   
     }
   });
-
 
   new Chart("academicCategoryChart", {
     type: "bar",
@@ -344,75 +372,54 @@ fetch("/api/chart-data/")
   
     }
   });
+})
 
-  new Chart("commonChart", {
+// CHARTS - others
+fetch("/api/chart-data/")
+.then(q => q.json())
+.then(r => {
+  new Chart("journalChart", {
     type: "bar",
     
     data: {
       
-      labels: r.commonKeys,
+      labels: r.journalList,
       datasets: [{
+        label:"Data",
         backgroundColor: barColors,
-        data: r.freqAll,
-        hoverBorderWidth:5,
-        label: "ALL"
-      },
-    {
-      label: '2017',
-      data: r.freq2017,
-      type: 'line',
-      fill: false,
-      borderColor: 'rgba(0, 255, 0, 0.6)'
-
-    },{
-      label: "2018",
-      data: r.freq2018,
-      type: "line",
-      fill: false,
-      borderColor: 'rgba(0, 127, 255, 0.6)'
-    },{
-      label: "2019",
-      data: r.freq2019,
-      type: "line",
-      fill: false,
-      borderColor: 'rgba(170, 255, 170, 0.6)'
-    },{
-      label: "2020",
-      data: r.freq2020,
-      type: "line",
-      fill: false,
-      borderColor: 'rgba(255, 86, 255, 0.6)'
-    },{
-      label: "2021",
-      data: r.freq2021,
-      type: "line",
-      fill: false,
-      borderColor: 'rgba(0, 0, 180, 0.6)'
-    },{
-      label: "2022",
-      data: r.freq2022,
-      type: "line",
-      fill: false,
-      borderColor: 'rgba(0, 180, 130, 0.6)'
-    }
-  ]
+        data: r.articleCount,
+        hoverBorderWidth:5
+      }]
     },
     options: {
       title: {
         display: true,
-        text: "TOP 20 Keywords' Frequancies per Article Title"
+        text: "Articles per Journals"
       },
       legend:{
-        display: true,
-      },
-      scales:{
-        yAxes:[{
-          ticks:{
-            beginAtZero: true
-          }
-        }]
+        display: false,
       }
   
+  
+    }
+  });
+  new Chart("quartileChart", {
+    type: "pie",
+    data: {
+      labels: r.quartile_list,
+      datasets: [{
+        backgroundColor: barColors,
+        data: r.quartile_num,
+        hoverBorderWidth: 5
+  
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: "Articles per Journal Quartile"
+      }
+      // hoverBackgroundColor: "black",
   
     }
   });
@@ -450,10 +457,10 @@ fetch("/api/chart-data/")
       
     }
   });
-
 })
 
 
+// SEARCH CHART
 new Chart("searchChart", {
   type: "bar",
   

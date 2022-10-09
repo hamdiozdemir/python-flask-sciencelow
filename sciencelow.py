@@ -47,18 +47,6 @@ def search():
     if request.method == "GET":
         return render_template("search.html")
     else:
-        # searchkey = str(request.form.get("searchkey"))
-        # cursor = mysql.connection.cursor()
-        # query = "SELECT * FROM articles WHERE article_title LIKE %s OR abstract LIKE %s ORDER BY year DESC"
-        # result = cursor.execute(query,('%'+searchkey+'%','%'+searchkey+'%'))
-        # if result == 0:
-        #     dataAll = []
-        #     dataYear, dataFreq = [0],[0]
-        #     return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
-        # else:
-        #     dataAll = cursor.fetchall()
-        #     dataYear, dataFreq = searchData(searchkey)
-        #     return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
         dataAll = []
         dataYear = []
         dataFreq = []
@@ -103,16 +91,13 @@ def search():
             return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
 
 
-
-
-
 @app.route("/admin")
 def admin():
     return render_template("admin.html")
 
-
 # --------------------------------- FUNCTIONS ------------------------------------------------------
 
+# Some main funcs to extract keywords at the begining, to insert them to DB
 def commonWords():
     common_words = list()
     file = open("bilgiler.txt","r")
@@ -134,7 +119,7 @@ def commonKeywords():
         i = i.split(" ")
         for j in i:
             j = j.lower()
-            j = "".join(ch for ch in j if j.isalnum())
+            j = "".join(ch for ch in j if j.isalpha())
             # j = j.replace(",","")
             # j = j.replace(":", "")
             # j = j.replace("?", "")
@@ -142,86 +127,14 @@ def commonKeywords():
             # j = j.replace("'", "")
             # j = j.replace("(", "")
             # j = j.replace(")", "")
-            if j in commons or j == "":
+            if j in commons or j == "" or len(j) < 4:
                 pass
             else:
                 keywords.append(j)
     cursor.close()
     return keywords
 
-def countedAll():
-    data = commonKeywords()
-    counted = Counter(data)
-    return counted
-
-def topCommonKeywords():
-    commonKeys = list()
-    commonFreq = list()
-    keywords = commonKeywords()
-    counted = Counter(keywords)
-    counted = counted.most_common(20)
-    for i in counted:
-        commonKeys.append(i[0])
-        commonFreq.append(i[1])
-    return commonKeys, commonFreq
-
-def topCommonKeywordsAll():
-    commonKey, commonFreq = topCommonKeywords()
-    data = {}
-    cursor = mysql.connection.cursor()
-    query = "SELECT * FROM articles WHERE year = %s AND article_title LIKE %s"
-    for year in range(2017,2023):
-        tempList = []
-        for key in commonKey:
-            freq = cursor.execute(query,(year,'%'+key+'%'))
-            tempList.append(freq)
-        data[year] = tempList
-    tempList = []
-    for key in commonKey:
-        query = "SELECT * FROM articles WHERE article_title LIKE %s"
-        freq = cursor.execute(query,('%'+key+'%',))
-        tempList.append(freq)
-    data["all"] = tempList           
-    cursor.close()
-    return commonKey, data
-      
-
-def searchData(key):
-    dataYear = []
-    dataFreq = []
-    cursor = mysql.connection.cursor()
-    query = "SELECT * FROM articles WHERE year=%s AND article_title LIKE %s"
-    for year in range(2017,2023):
-        freq = cursor.execute(query,(year,"%"+key+"%",))
-        dataYear.append(year)
-        dataFreq.append(freq)
-    cursor.close()
-    return dataYear, dataFreq
-
-def searchData2(key):
-    dataYear = []
-    dataFreq = []
-    cursor = mysql.connection.cursor()
-    query = "SELECT * FROM articles WHERE year=%s AND abstract LIKE %s"
-    for year in range(2017,2023):
-        freq = cursor.execute(query,(year,"%"+key+"%",))
-        dataYear.append(year)
-        dataFreq.append(freq)
-    cursor.close()
-    return dataYear, dataFreq
-
-def searchData3(key):
-    dataYear = []
-    dataFreq = []
-    cursor = mysql.connection.cursor()
-    query = "SELECT * FROM articles WHERE year=%s AND authors LIKE %s"
-    for year in range(2017,2023):
-        freq = cursor.execute(query,(year,"%"+key+"%",))
-        dataYear.append(year)
-        dataFreq.append(freq)
-    cursor.close()
-    return dataYear, dataFreq
-
+# Journal related funcs
 def journal_infos():
     cursor = mysql.connection.cursor()
     cursor.execute("SELECT * FROM journals ORDER BY article_num DESC")
@@ -260,21 +173,21 @@ def quartileNum():
         quartile_num.append(data["SUM(article_num)"])
     return quartile_list, quartile_num
 
+# Category Funcs
+# getCategories func, gets the datas from db and prettify a bit by turning them as a nested dicts
 def getCategories():
-    categories = {
-        "family": {"parenting":0,"parental":0,"parents":0,"maternal":0,"families":0,"mothers":0,"caregiver":0,"caregiver":0,"partner":0,"fathers":0,"siblings":0,"sibling":0,"paternal":0,"coparenting":0,"interparental":0,"carers":0,"familial":0,"foster":0,"overparenting":0},
-        "academic": {"learning":0,"reading":0,"literacy":0,"academic":0,"lessons":0,"writing":0,"math":0,"stem":0,"mathematical":0,"vocabulary":0,"literacies":0,"mathematics":0},
-        "sen": {"disorder":0,"autism":0,"disabilities":0,"adhd":0,"dyslexia":0,"dysmorphia":0},
-        "wellbeing": {"stress":0,"welfare":0,"anxiety":0,"depressive":0,"wellbeing":0,"trauma":0,"distress":0,"healthy":0,"illness":0,"satisfaction":0,"abuse":0},
-        "diversity": {"gender":0,"poverty":0,"cultural":0,"immigrant":0,"refugee":0,"diverse":0,"racial":0,"ethnic":0,"minority":0,"inclusive":0,"culturally":0,"migrant":0,"inclusion":0,"gendered":0,"immigrants":0},
-        "digital": {"digital":0,"television":0,"mobile":0,"screen":0,"cyberbullying":0},
-        "attidute" : {"violence":0,"bullying":0,"maltreatment":0,"aggression":0,"cyberbullying":0}
-        }
-    common_keywords = commonKeywords()
-    counted_keywords = Counter(common_keywords)
-    for value in categories.values():
-        for key in value:
-            value[key] = counted_keywords[key]
+    cursor = mysql.connection.cursor()
+    query = "SELECT keywords.keyword, keywords.freqSum, categories.category FROM keywords INNER JOIN categories ON keywords.keyword = categories.keyword"
+    cursor.execute(query,)
+    datas = cursor.fetchall()
+    cursor.close()
+    categories = {}
+    for data in datas:
+        categories.update({data["category"]:{}})
+    for data in datas:
+        for k,v in categories.items():
+            if data["category"] == k:
+                v.update({data["keyword"]:data["freqSum"]})
     return categories
 
 def allCategories():
@@ -309,7 +222,6 @@ def categorySen():
     senKey = list(x.keys()) 
     senValue = list(x.values())
     return senKey, senValue
-
 
 def categoryWellbeing():
     data = getCategories()
@@ -351,16 +263,73 @@ def categoryOthers():
     cursor.close()
     return othersKey, othersValue
 
+# SEARCH Funcs
+def searchData(key):
+    dataYear = []
+    dataFreq = []
+    cursor = mysql.connection.cursor()
+    query = "SELECT * FROM articles WHERE year=%s AND article_title LIKE %s"
+    for year in range(2017,2023):
+        freq = cursor.execute(query,(year,"%"+key+"%",))
+        dataYear.append(year)
+        dataFreq.append(freq)
+    cursor.close()
+    return dataYear, dataFreq
 
-@app.route("/api/chart-data/")
-def allVariables():
-    journaldata = journal_infos()
-    journalList = [journal["journal_title"] for journal in journaldata]
-    articleCount = [num["article_num"] for num in journaldata]
-    quartile_list, quartile_num = quartileNum()
-    allKey, allValue = allCategories()
-    articleNum, articleYear = articlePerYear()
-    commonKeys, data = topCommonKeywordsAll()
+def searchData2(key):
+    dataYear = []
+    dataFreq = []
+    cursor = mysql.connection.cursor()
+    query = "SELECT * FROM articles WHERE year=%s AND abstract LIKE %s"
+    for year in range(2017,2023):
+        freq = cursor.execute(query,(year,"%"+key+"%",))
+        dataYear.append(year)
+        dataFreq.append(freq)
+    cursor.close()
+    return dataYear, dataFreq
+
+def searchData3(key):
+    dataYear = []
+    dataFreq = []
+    cursor = mysql.connection.cursor()
+    query = "SELECT * FROM articles WHERE year=%s AND authors LIKE %s"
+    for year in range(2017,2023):
+        freq = cursor.execute(query,(year,"%"+key+"%",))
+        dataYear.append(year)
+        dataFreq.append(freq)
+    cursor.close()
+    return dataYear, dataFreq
+
+
+# ---------- CHART APIs ---------------
+# API's are seperated for better performance
+@app.route("/api/chart-data-top/")
+def topKeywords():
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM keywords ORDER BY freqSum DESC LIMIT 20")
+    dataAll = cursor.fetchall()
+    topKeys = [data["keyword"] for data in dataAll]
+    freqSum = [data["freqSum"] for data in dataAll]
+    freq2017 = [data["freq2017"] for data in dataAll]
+    freq2018 = [data["freq2018"] for data in dataAll]
+    freq2019 = [data["freq2019"] for data in dataAll]
+    freq2020 = [data["freq2020"] for data in dataAll]
+    freq2021 = [data["freq2021"] for data in dataAll]
+    freq2022 = [data["freq2022"] for data in dataAll]
+
+    return jsonify(
+        topKeys = topKeys,
+        freqSum = freqSum,
+        freq2017 = freq2017,
+        freq2018 = freq2018,
+        freq2019 = freq2019,
+        freq2020 = freq2020,
+        freq2021 = freq2021,
+        freq2022 = freq2022
+    )
+
+@app.route("/api/chart-data-categories/")
+def categoryVariables():
     familyKey, familyValue = categoryFamily()
     academicKey, academicValue = categoryAcademic()
     senKey, senValue = categorySen()
@@ -369,29 +338,14 @@ def allVariables():
     digitalKey, digitalValue = categoryDigital()
     attiduteKey, attiduteValue = categoryAttidute()
     othersKey, othersValue = categoryOthers()
-    
-
+    allKey, allValue = allCategories()
     return jsonify(
-        quartile_list=quartile_list,
-        quartile_num=quartile_num,
-        journalList=journalList,
-        articleCount=articleCount,
         allKey = allKey,
         allValue = allValue,
         familyKey = familyKey,
         familyValue = familyValue,
         academicKey = academicKey,
         academicValue=academicValue,
-        articleNum = articleNum,
-        articleYear = articleYear,
-        commonKeys = commonKeys,
-        freqAll = data["all"],
-        freq2017 = data[2017],
-        freq2018 = data[2018],
-        freq2019 = data[2019],
-        freq2020 = data[2020],
-        freq2021 = data[2021],
-        freq2022 = data[2022],
         senKey = senKey,
         senValue=senValue,
         wellbeingKey=wellbeingKey,
@@ -404,17 +358,23 @@ def allVariables():
         attiduteValue=attiduteValue,
         othersKey=othersKey,
         othersValue=othersValue
-
     )
 
-
-
-
-
-
-
-
-
+@app.route("/api/chart-data/")
+def allVariables():
+    journaldata = journal_infos()
+    journalList = [journal["journal_title"] for journal in journaldata]
+    articleCount = [num["article_num"] for num in journaldata]
+    quartile_list, quartile_num = quartileNum()
+    articleNum, articleYear = articlePerYear()
+    return jsonify(
+        quartile_list=quartile_list,
+        quartile_num=quartile_num,
+        journalList=journalList,
+        articleCount=articleCount,
+        articleNum = articleNum,
+        articleYear = articleYear,
+    )
 
 
 
