@@ -1,4 +1,4 @@
-from urllib import request
+from urllib3 import request
 from flask import Flask, render_template,jsonify,request
 from flask_mysqldb import MySQL
 
