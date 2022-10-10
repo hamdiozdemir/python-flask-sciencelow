@@ -1,7 +1,6 @@
 from urllib import request
-from flask import Flask, render_template,redirect,url_for,jsonify,request
+from flask import Flask, render_template,jsonify,request
 from flask_mysqldb import MySQL
-from collections import Counter
 
 app = Flask(__name__)
 
