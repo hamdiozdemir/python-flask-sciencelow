@@ -8,7 +8,8 @@ A mini website for some basic analysis of the scientific articles on Early Child
 
 API
 
- - ./api/abstract/<string:searchkey>/        returns the records that titles have the searching keyword
+ - ./api/title/<string:searchkey>/        returns the records that titles includes the searching keyword
+ - ./api/abstract/<string:searchkey>/        returns the records that abstract includes the searching keyword
  - ./api/year/<string:year>/       returns the records that published in the year given
  - ./api/top_keywords/<string:limit>/       returns the records that top common keywords with the lenght given
 
