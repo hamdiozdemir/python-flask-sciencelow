@@ -7,10 +7,10 @@ app = Flask(__name__)
 mysql = MySQL(app)
 app.secret_key = "sciencebitch"
 
-app.config["MYSQL_HOST"] = "localhost"
-app.config["MYSQL_USER"] = "root"
-app.config["MYSQL_PASSWORD"] = ""
-app.config["MYSQL_DB"] = "sciencelow"
+app.config["MYSQL_HOST"] = "sciencelow.mysql.pythonanywhere-services.com"
+app.config["MYSQL_USER"] = "sciencelow"
+app.config["MYSQL_PASSWORD"] = "flaskpassword"
+app.config["MYSQL_DB"] = "sciencelow$default"
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 
 
@@ -53,7 +53,7 @@ def search():
             searchkey = str(request.form.get("searchkey"))
             dataYear, dataFreq = searchData(searchkey)
             cursor = mysql.connection.cursor()
-            result = cursor.execute("SELECT * FROM articles WHERE article_title LIKE '%"+searchkey+"%'")
+            result = cursor.execute("SELECT * FROM articles WHERE article_title LIKE '%"+searchkey+"%' ORDER BY year DESC")
             if result == 0:
                 dataAll = []
             else:
@@ -64,19 +64,19 @@ def search():
             searchkey = str(request.form.get("searchkey2"))
             dataYear, dataFreq = searchData2(searchkey)
             cursor = mysql.connection.cursor()
-            result = cursor.execute("SELECT * FROM articles WHERE abstract LIKE '%"+searchkey+"%'")
+            result = cursor.execute("SELECT * FROM articles WHERE abstract LIKE '%"+searchkey+"%' ORDER BY year DESC")
             if result == 0:
                 dataAll = []
             else:
                 dataAll = cursor.fetchall()
             cursor.close()
             return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
-            
+
         elif "searchkey3" in request.form:
             searchkey = str(request.form.get("searchkey3"))
             dataYear, dataFreq = searchData3(searchkey)
             cursor = mysql.connection.cursor()
-            result = cursor.execute("SELECT * FROM articles WHERE authors LIKE '%"+searchkey+"%'")
+            result = cursor.execute("SELECT * FROM articles WHERE authors LIKE '%"+searchkey+"%' ORDER BY year DESC")
             if result == 0:
                 dataAll = []
             else:
@@ -88,6 +88,62 @@ def search():
             dataYear = [0]
             dataFreq = [0]
             return render_template("search.html",dataAll=dataAll,dataYear=dataYear,dataFreq=dataFreq)
+
+
+@app.route("/api/title/<string:searchkey>/", methods=["GET"])
+def api_title(searchkey):
+
+    cursor = mysql.connection.cursor()
+    result = cursor.execute("SELECT * FROM articles WHERE article_title LIKE '%"+searchkey+"%' ORDER BY year DESC")
+    if result == 0:
+        data = {"abstract": None,"article_link": None,"article_title": None,"authors": None,"id": None,"issue": None,"journal_title": None,"volume": None,"year": None}
+    else:
+        data = cursor.fetchall()
+    cursor.close()
+    return jsonify(data)
+
+
+@app.route("/api/abstract/<string:searchkey>/", methods=["GET"])
+def api_abstract(searchkey):
+
+    cursor = mysql.connection.cursor()
+    result = cursor.execute("SELECT * FROM articles WHERE abstract LIKE '%"+searchkey+"%' ORDER BY year DESC")
+    if result == 0:
+        data = {"abstract": None,"article_link": None,"article_title": None,"authors": None,"id": None,"issue": None,"journal_title": None,"volume": None,"year": None}
+    else:
+        data = cursor.fetchall()
+    cursor.close()
+    return jsonify(data)
+
+@app.route("/api/year/<string:searchkey>/", methods=["GET"])
+def api_year(searchkey):
+    try:
+        cursor = mysql.connection.cursor()
+        result = cursor.execute("SELECT * FROM articles WHERE year="+searchkey +" ORDER BY year DESC")
+        if result == 0:
+            data = {"abstract": None,"article_link": None,"article_title": None,"authors": None,"id": None,"issue": None,"journal_title": None,"volume": None,"year": None}
+        else:
+            data = cursor.fetchall()
+        cursor.close()
+        return jsonify(data)
+    except:
+        data = {"error": "API error. "}
+        return jsonify(data)
+
+@app.route("/api/top_keywords/<string:limit>/", methods=["GET"])
+def api_top_keywords(limit):
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT * FROM keywords ORDER BY freqSum DESC LIMIT "+limit)
+        data_all = cursor.fetchall()
+        cursor.close()
+        data = dict()
+        for item in data_all:
+            data.update({item["keyword"]: item["freqSum"]})
+        return jsonify(data)
+    except:
+        data = {"error": "Key or Limit error."}
+        return jsonify(data)
 
 
 @app.route("/admin")
@@ -204,21 +260,21 @@ def allCategories():
 def categoryFamily():
     data = getCategories()
     x = data.get("family")
-    familyKey = list(x.keys()) 
+    familyKey = list(x.keys())
     familyValue = list(x.values())
     return familyKey,familyValue
 
 def categoryAcademic():
     data = getCategories()
     x = data.get("academic")
-    academicKey = list(x.keys()) 
+    academicKey = list(x.keys())
     academicValue = list(x.values())
     return academicKey, academicValue
 
 def categorySen():
     data = getCategories()
     x = data.get("sen")
-    senKey = list(x.keys()) 
+    senKey = list(x.keys())
     senValue = list(x.values())
     return senKey, senValue
 
@@ -233,7 +289,7 @@ def categoryDiversity():
     data = getCategories()
     x = data.get("diversity")
     diversityKey = list(x.keys())
-    diversityValue = list(x.values()) 
+    diversityValue = list(x.values())
     return diversityKey, diversityValue
 
 def categoryDigital():
